@@ -49,6 +49,8 @@ void test_mindex_basics() {
   found = mindex_get(mindex, test_a01);
 
   ASSERT("Overridden get by new returns new", found == test_a01);
+
+  mindex_free(mindex);
 }
 
 int main() {
