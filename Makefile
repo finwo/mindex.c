@@ -1,5 +1,5 @@
 SRC:=
-SRC+=$(wildcard src/*.c)
+include config.mk
 SRC+=test.c
 
 INCLUDES?=
