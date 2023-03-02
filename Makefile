@@ -2,6 +2,9 @@ SRC:=
 SRC+=$(wildcard src/*.c)
 SRC+=test.c
 
+INCLUDES?=
+INCLUDES+=-I src
+
 override CFLAGS?=-Wall -g -O2
 
 include lib/.dep/config.mk
