@@ -1,3 +1,5 @@
+#include "finwo/assert.h"
+
 int main() {
-  return 42;
+  return TEST_REPORT();
 }
