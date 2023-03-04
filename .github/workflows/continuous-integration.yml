@@ -9,8 +9,8 @@ on:
 
 jobs:
 
-  test:
-    name: Test
+  test-default:
+    name: Test default
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,4 +18,56 @@ jobs:
       - run : dep install
       - run : make clean
       - run : make
+      - run : ./test
+
+  test-os:
+    name: Test -Os
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@edge
+      - run : dep install
+      - run : make clean
+      - run : make
+        env:
+          CFLAGS: "-Wall -std=c99 -Os"
+      - run : ./test
+
+  test-o1:
+    name: Test -O1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@edge
+      - run : dep install
+      - run : make clean
+      - run : make
+        env:
+          CFLAGS: "-Wall -std=c99 -O1"
+      - run : ./test
+
+  test-o2:
+    name: Test -O2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@edge
+      - run : dep install
+      - run : make clean
+      - run : make
+        env:
+          CFLAGS: "-Wall -std=c99 -O2"
+      - run : ./test
+
+  test-o3:
+    name: Test -O3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@edge
+      - run : dep install
+      - run : make clean
+      - run : make
+        env:
+          CFLAGS: "-Wall -std=c99 -O3"
       - run : ./test
