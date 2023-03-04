@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "noporpoise/sort_r.h"
+
 #include "mindex.h"
 
 #ifndef MINDEX_SPARE
@@ -49,7 +51,7 @@ void mindex_set(struct mindex_t *mindex, void *item) {
   mindex->spare--;
 
   // Sort the list
-  qsort_r(mindex->items, mindex->length, sizeof(void *), mindex->compare, mindex->udata);
+  sort_r(mindex->items, mindex->length, sizeof(void *), mindex->compare, mindex->udata);
 
   // Done
 }
@@ -125,6 +127,7 @@ void * mindex_rand(struct mindex_t *mindex) {
 }
 
 // TODO: mindex_delete_internal(..., items, idx)
+// TODO: delete an exact pointer, not a pattern (extra fn?)
 
 void mindex_delete(struct mindex_t *mindex, void *pattern) {
   int idx = mindex_get_internal(mindex->items, mindex->length, pattern, mindex->compare, mindex->udata);
