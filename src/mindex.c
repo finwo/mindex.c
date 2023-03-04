@@ -22,6 +22,15 @@ struct mindex_t * mindex_init(int (*compare)(const void *a, const void *b, void 
   return mindex;
 }
 
+static int mindex_compare_wrap(const void *a, const void *b, void *udata) {
+  struct mindex_t *mindex = udata;
+  return mindex->compare(
+      *(void**)a,
+      *(void**)b,
+      mindex->udata
+  );
+}
+
 void mindex_set(struct mindex_t *mindex, void *item) {
 
   // Check if the item is already in the list
@@ -50,7 +59,7 @@ void mindex_set(struct mindex_t *mindex, void *item) {
   mindex->spare--;
 
   // Sort the list
-  sort_r(mindex->items, mindex->length, sizeof(void *), mindex->compare, mindex->udata);
+  sort_r(mindex->items, mindex->length, sizeof(void *), mindex_compare_wrap, mindex);
 
   // Done
 }
