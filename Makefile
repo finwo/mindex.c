@@ -5,7 +5,7 @@ SRC+=test.c
 INCLUDES?=
 INCLUDES+=-I src
 
-override CFLAGS?=-Wall -s -std=c99
+override CFLAGS?=-Wall -std=c99
 
 include lib/.dep/config.mk
 
