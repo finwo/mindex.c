@@ -35,8 +35,7 @@ void mindex_set(struct mindex_t *mindex, void *item) {
   // Different pointer, so remove from the list
   // Indicate to lib user that it needs to be purged from mem
   if (found) {
-    mindex_delete(mindex, found);
-    mindex->purge(found, mindex->udata);
+    mindex_delete(mindex, item);
   }
 
   // Allocate more space if we ran out
@@ -134,9 +133,7 @@ void mindex_delete(struct mindex_t *mindex, void *pattern) {
   void *item = mindex->items[idx];
 
   // Purge if not an exact match
-  if (item != pattern) {
-    mindex->purge(item, mindex->udata);
-  }
+  mindex->purge(item, mindex->udata);
 
   // Move everything on it's right to it
   void *dst = &(mindex->items[idx]);
