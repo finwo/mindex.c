@@ -150,7 +150,7 @@ void mindex_delete(struct mindex_t *mindex, void *pattern) {
   // Move everything on it's right to it
   void *dst = &(mindex->items[idx]);
   void *src = &(mindex->items[idx+1]);
-  memmove(dst, src, mindex->length - idx - 1);
+  memmove(dst, src, (mindex->length - idx - 1) * sizeof(void*));
 
   // Update our size trackers
   mindex->length--;
