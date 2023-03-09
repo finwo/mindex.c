@@ -139,9 +139,12 @@ void * mindex_rand(struct mindex_t *mindex) {
 
 void mindex_delete(struct mindex_t *mindex, void *pattern) {
   int idx = mindex_get_internal(mindex->items, mindex->length, pattern, mindex->compare, mindex->udata);
-  void *item = mindex->items[idx];
+  if (idx < 0) {
+    return;
+  }
 
-  // Purge if not an exact match
+  // Call user's purge method
+  void *item = mindex->items[idx];
   mindex->purge(item, mindex->udata);
 
   // Move everything on it's right to it
