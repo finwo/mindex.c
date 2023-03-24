@@ -10,7 +10,7 @@ on:
 jobs:
 
   benchmark-default:
-    name: Test default
+    name: Benchmark default
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,6 +18,58 @@ jobs:
       - run : dep install
       - run : make clean
       - run : make
+      - run : ./benchmark
+
+  benchmark-os:
+    name: Benchmark -Os
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@edge
+      - run : dep install
+      - run : make clean
+      - run : make
+        env:
+          CFLAGS: "-Wall -std=c99 -Os"
+      - run : ./benchmark
+
+  benchmark-o1:
+    name: Benchmark -O1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@edge
+      - run : dep install
+      - run : make clean
+      - run : make
+        env:
+          CFLAGS: "-Wall -std=c99 -O1"
+      - run : ./benchmark
+
+  benchmark-o2:
+    name: Benchmark -O2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@edge
+      - run : dep install
+      - run : make clean
+      - run : make
+        env:
+          CFLAGS: "-Wall -std=c99 -O2"
+      - run : ./benchmark
+
+  benchmark-o3:
+    name: Benchmark -O3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: finwo/dep@edge
+      - run : dep install
+      - run : make clean
+      - run : make
+        env:
+          CFLAGS: "-Wall -std=c99 -O3"
       - run : ./benchmark
 
   test-default:
