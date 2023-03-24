@@ -40,5 +40,5 @@ int main() {
   };
 
   BMARK(mindex_some_bmark_method);
-  return bmark_run(10000, percentiles);
+  return bmark_run(100, percentiles);
 }
