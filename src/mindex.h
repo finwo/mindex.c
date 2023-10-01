@@ -8,7 +8,7 @@ struct mindex_t {
   void (*purge)(const void *item, void *udata);
   void *udata;
   size_t length;
-  size_t spare;
+  size_t max;
   void **items;
 };
 

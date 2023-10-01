@@ -43,9 +43,7 @@ void mindex_bmark_rstr_1024() {
 }
 
 void mindex_bmark_assign_1024() {
-/* struct mindex_t * mindex_init(int (*compare)(const void *a, const void *b, void *udata), void (*purge)(const void *item, void *udata), void *udata); */
   struct mindex_t *mindex = mindex_init(fn_compare_string, fn_purge, NULL);
-    /* fr */
   for(int i=0; i<1024; i++) {
     mindex_set(mindex, random_str(16));
   }
