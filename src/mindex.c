@@ -3,13 +3,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "noporpoise/sort_r.h"
-
 #include "mindex.h"
 
 #ifndef MINDEX_SPARE
 #define MINDEX_SPARE 16
 #endif
+
+int mindex_signal_found = 1;
+int mindex_signal_over  = 2;
+int mindex_signal_under = 4;
+int mindex_signal_empty = 8;
+
+struct mindex_find_response {
+  int signal;
+  int index;
+  void *value; // NULL = not found
+};
 
 struct mindex_t * mindex_init(int (*compare)(const void *a, const void *b, void *udata), void (*purge)(const void *item, void *udata), void *udata) {
   struct mindex_t *mindex = malloc(sizeof(struct mindex_t));
@@ -18,113 +27,119 @@ struct mindex_t * mindex_init(int (*compare)(const void *a, const void *b, void 
   mindex->udata   = udata;
   mindex->items   = malloc(MINDEX_SPARE * sizeof(void*));
   mindex->length  = 0;
-  mindex->spare   = MINDEX_SPARE;
+  mindex->max     = MINDEX_SPARE;
   return mindex;
 }
 
-static int mindex_compare_wrap(const void *a, const void *b, void *udata) {
-  struct mindex_t *mindex = udata;
-  return mindex->compare(
-      *(void**)a,
-      *(void**)b,
-      mindex->udata
-  );
+struct mindex_find_response * mindex_find(const struct mindex_t *mindex, const void *pattern, void **items, int length) {
+  int acc, idx, newlength;
+  struct mindex_find_response *resp;
+
+  // Nothing to search = done
+  if (length <= 0) {
+    return &((struct mindex_find_response){
+      .signal = mindex_signal_empty,
+      .index  = 0,
+      .value  = NULL,
+    });
+  }
+
+  // Make the actual comparison, splitting the array in 2
+  idx = length / 2;
+  acc = mindex->compare(pattern, items[idx], mindex->udata);
+
+  // Pattern = below middlepoint
+  if (acc < 0) {
+
+    // Limit deeper search to only the left side
+    newlength = idx;
+
+    // Nothing to our left, item not found
+    if (newlength <= 0) {
+      return &((struct mindex_find_response){
+        .signal = mindex_signal_under,
+        .index  = 0,
+        .value  = NULL,
+      });
+    }
+
+    // Limit deeper search to only the left side
+    newlength = idx;
+
+    // Run the find on items below
+    resp = mindex_find(mindex, pattern, items, newlength);
+
+    // Surpress "over" signal
+    resp->signal &= ~mindex_signal_over;
+
+    return resp;
+  }
+
+  // Pattern = above middlepoint
+  if (acc > 0) {
+
+    // Calculate new index to check
+    newlength = length - 1 - idx;
+
+    // Nothing to our right, item not found
+    if (newlength <= 0) {
+      return &((struct mindex_find_response){
+        .signal = mindex_signal_over,
+        .index  = length,
+        .value  = NULL,
+      });
+    }
+
+    // Get stats on the right-side of our pivot & translate response index
+    resp = mindex_find(mindex, pattern, &(items[idx+1]), newlength);
+    resp->index += idx + 1;
+
+    // Surpress "under" signal
+    resp->signal &= ~mindex_signal_under;
+
+    return resp;
+  }
+
+  // Found = win
+  return &((struct mindex_find_response){
+    .signal = mindex_signal_found,
+    .index  = idx,
+    .value  = items[idx],
+  });
 }
 
 void mindex_set(struct mindex_t *mindex, void *item) {
+  size_t movesize;
 
-  // Check if the item is already in the list
-  void *found = mindex_get(mindex, item);
+  // Ensure we have space to insert a new item
+  if (mindex->max == mindex->length) {
+    mindex->max   = mindex->max * 2;
+    mindex->items = realloc(mindex->items, mindex->max * sizeof(void*));
+  }
 
-  // The exact pointer already there = done
-  if (found && (item == found)) {
+  // Find the index to insert (or already-occupied pattern)
+  struct mindex_find_response *resp = mindex_find(mindex, item, mindex->items, mindex->length);
+
+  // Item already in there, notify we skipped insertion
+  if (resp->signal & mindex_signal_found) {
+    mindex->items[resp->index] = item;
+    mindex->purge(item, mindex->udata);
     return;
   }
 
-  // Different pointer, so remove from the list
-  // Indicate to lib user that it needs to be purged from mem
-  if (found) {
-    mindex_delete(mindex, item);
-  }
-
-  // Allocate more space if we ran out
-  if (!mindex->spare) {
-    mindex->items = realloc(mindex->items, (mindex->length + MINDEX_SPARE) * sizeof(void*));
-    mindex->spare = MINDEX_SPARE;
-  }
-
-  // Add the new item to the end of the list
-  mindex->items[mindex->length] = item;
+  // Move items above aside for the insertion
+  // Essentially single-step insertion sort
+  movesize = (mindex->length - resp->index) * sizeof(void*);
+  memmove(&(mindex->items[resp->index + 1]), &(mindex->items[resp->index]), movesize);
+  mindex->items[resp->index] = item;
   mindex->length++;
-  mindex->spare--;
 
-  // Sort the list
-  sort_r(mindex->items, mindex->length, sizeof(void *), mindex_compare_wrap, mindex);
-
-  // Done
-}
-
-// Returns the INDEX within the items, not the item itself
-int mindex_get_internal(void **items, size_t length, void *pattern, int (*compare)(const void *a, const void *b, void *udata), void *udata) {
-  int sub;
-
-  // No entries = not found
-  if (length < 1) {
-    return -1;
-  }
-
-  // Test the middle of the array
-  size_t testIdx = length / 2;
-  int compare_result = compare(items[testIdx], pattern, udata);
-
-  // Match = found
-  if (compare_result == 0) {
-    return testIdx;
-  }
-
-  // Pattern = to the right
-  if (compare_result < 0) {
-    sub = mindex_get_internal(
-      &(items[testIdx+1]),
-      length - testIdx - 1,
-      pattern,
-      compare,
-      udata
-    );
-
-    // Pass along error code
-    if (sub < 0) {
-      return sub;
-    }
-
-    // Return mapped location
-    return sub + testIdx + 1;
-  }
-
-  // Pattern to the left
-  if (compare_result > 0) {
-    return mindex_get_internal(
-      items,
-      testIdx,
-      pattern,
-      compare,
-      udata
-    );
-  }
-
-  // Should never be called
-  return -2;
+  // Aanndd.. We're done
 }
 
 void * mindex_get(struct mindex_t *mindex, void *pattern) {
-  int idx = mindex_get_internal(mindex->items, mindex->length, pattern, mindex->compare, mindex->udata);
-
-  // Not found
-  if (idx < 0) {
-    return NULL;
-  }
-
-  return mindex->items[idx];
+  struct mindex_find_response *resp = mindex_find(mindex, pattern, mindex->items, mindex->length);
+  return resp->value;
 }
 
 void * mindex_rand(struct mindex_t *mindex) {
@@ -134,33 +149,27 @@ void * mindex_rand(struct mindex_t *mindex) {
   return mindex->items[rand() % mindex->length];
 }
 
-// TODO: mindex_delete_internal(..., items, idx)
-// TODO: delete an exact pointer, not a pattern (extra fn?)
-
 void mindex_delete(struct mindex_t *mindex, void *pattern) {
-  int idx = mindex_get_internal(mindex->items, mindex->length, pattern, mindex->compare, mindex->udata);
-  if (idx < 0) {
+  struct mindex_find_response *resp = mindex_find(mindex, pattern, mindex->items, mindex->length);
+
+  // Not found = done
+  if (!(resp->signal & mindex_signal_found)) {
     return;
   }
 
   // Call user's purge method
-  void *item = mindex->items[idx];
+  void *item = mindex->items[resp->index];
   mindex->purge(item, mindex->udata);
 
   // Move everything on it's right to it
-  void *dst = &(mindex->items[idx]);
-  void *src = &(mindex->items[idx+1]);
-  memmove(dst, src, (mindex->length - idx - 1) * sizeof(void*));
+  void *dst = &(mindex->items[resp->index]);
+  void *src = &(mindex->items[resp->index+1]);
+  memmove(dst, src, (mindex->length - resp->index - 1) * sizeof(void*));
 
-  // Update our size trackers
+  // Update our size tracker
   mindex->length--;
-  mindex->spare++;
 
-  // Free some memory if we have a lot of spares
-  if (mindex->spare > (MINDEX_SPARE*2)) {
-    mindex->items = realloc(mindex->items, (mindex->length + MINDEX_SPARE) * sizeof(void*));
-    mindex->spare = MINDEX_SPARE;
-  }
+  // TODO: reduce memory usage?
 
   // Done
 }
