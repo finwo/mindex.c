@@ -6,7 +6,7 @@
 #include "finwo/assert.h"
 #include "mindex.h"
 
-static void fn_purge(const void *item, void *udata) {
+static void fn_purge(void *item, void *udata) {
   // Intentionally empty
 }
 
