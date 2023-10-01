@@ -20,7 +20,7 @@ struct mindex_find_response {
   void *value; // NULL = not found
 };
 
-struct mindex_t * mindex_init(int (*compare)(const void *a, const void *b, void *udata), void (*purge)(const void *item, void *udata), void *udata) {
+struct mindex_t * mindex_init(int (*compare)(const void *a, const void *b, void *udata), void (*purge)(void *item, void *udata), void *udata) {
   struct mindex_t *mindex = malloc(sizeof(struct mindex_t));
   mindex->compare = compare;
   mindex->purge   = purge;
