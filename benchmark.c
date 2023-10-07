@@ -21,16 +21,12 @@ static int fn_compare_string(const void *a, const void *b, void *udata) {
   return strcmp(sa, sb);
 }
 
-char random_char() {
-  char *alphabet = "0123456789abcdef";
-  int   length   = strlen(alphabet);
-  return alphabet[rand() % length];
-}
-
+const char *alphabet = "0123456789abcdef";
+int        alen      = sizeof(alphabet);
 char *random_str(int length) {
-  char *str = malloc(length + 1);
+  char       *str      = malloc(length + 1);
   for(int i=0; i<length; i++) {
-    str[i] = random_char();
+    str[i] = alphabet[rand() % alen];
   }
   str[length] = '\0';
   return str;
