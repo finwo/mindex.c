@@ -123,7 +123,7 @@ void mindex_set(struct mindex_t *mindex, void *item) {
   // Item already in there, notify we skipped insertion
   if (resp->signal & mindex_signal_found) {
     mindex->items[resp->index] = item;
-    mindex->purge(item, mindex->udata);
+    mindex->purge(resp->value, mindex->udata);
     free(resp);
     return;
   }
