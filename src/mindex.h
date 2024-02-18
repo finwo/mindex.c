@@ -15,6 +15,7 @@ struct mindex_t {
 struct mindex_t * mindex_init(int (*compare)(const void *a, const void *b, void *udata), void (*purge)(void *item, void *udata), void *udata);
 void              mindex_set(struct mindex_t *mindex, void *item);
 void            * mindex_get(struct mindex_t *mindex, void *pattern);
+void            * mindex_nth(struct mindex_t *mindex, int index);
 void            * mindex_rand(struct mindex_t *mindex);
 void              mindex_delete(struct mindex_t *mindex, void *pattern);
 size_t            mindex_length(struct mindex_t *mindex);

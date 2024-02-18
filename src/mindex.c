@@ -146,6 +146,13 @@ void * mindex_get(struct mindex_t *mindex, void *pattern) {
   return value;
 }
 
+void * mindex_nth(struct mindex_t *mindex, int index) {
+  if (index >= mindex->length) {
+    return NULL;
+  }
+  return mindex->items[index];
+}
+
 void * mindex_rand(struct mindex_t *mindex) {
   if (!mindex->length) {
     return NULL;
