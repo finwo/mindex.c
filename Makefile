@@ -17,7 +17,7 @@ BIN=\
 	benchmark \
 	test
 
-default: $(BIN)
+default: README.md $(BIN)
 
 $(BIN): $(OBJ) $(BIN:=.o)
 	$(CC) $(CFLAGS) $(OBJ) $@.o -o $@
@@ -27,3 +27,6 @@ clean:
 	rm -f $(OBJ)
 	rm -f $(BIN:=.o)
 	rm -f test
+
+README.md: ${SRC} src/mindex.h
+	stddoc < src/mindex.h > README.md

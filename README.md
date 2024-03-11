@@ -23,73 +23,127 @@ Features
 - Consistent interface, always working with pointers
 - ANSI C (C99)
 - Purge to be called when an item is removed
-
-Example
--------
-
-```c
-int main() {
-  // TODO
-}
-```
-
 API
 ---
 
-### Basic
+### Structures
 
-```c
-struct mindex_t * mindex_init(int (*compare)(const void *a, const void *b, void *udata), void (*purge)(const void *item, void *udata), void *udata);
+<details>
+  <summary>struct mindex_t</summary>
+
+  The main handle of the mindex instance
+
+```C
+struct mindex_t {
+ int (*compare)(const void *a, const void *b, void *udata);
+ void (*purge)(void *item, void *udata);
+ void *udata;
+ size_t length;
+ size_t max;
+ void **items;
+};
 ```
 
-Initialize the indexing library.
+</details>
 
-```c
-void              mindex_set(struct mindex_t *mindex, void *item);
+### Methods
+
+<details>
+  <summary>mindex_init(cmp, purge, udata)</summary>
+
+  Initialize a new in-memory index
+
+```C
+struct mindex_t * mindex_init(int (*compare)(const void *a, const void *b, void *udata), void (*purge)(void *item, void *udata), void *udata);
 ```
 
-Insert or replace an existing item
+</details>
+<details>
+  <summary>mindex_find(mindex, pattern, items, length)</summary>
 
-```c
-void            * mindex_get(struct mindex_t *mindex, void *pattern);
+  Intended for internal use or advanced usage (like fetching both index &
+  the pointer of the result)
+
+```C
+struct mindex_find_response * mindex_find(const struct mindex_t *mindex, const void *pattern, void **items, int length);
 ```
 
-Get an existing item
+</details>
+<details>
+  <summary>mindex_set(mindex, item)</summary>
 
-```c
-void              mindex_delete(struct mindex_t *mindex, void *pattern);
+  Insert or replace an existing item
+
+```C
+void mindex_set(struct mindex_t *mindex, void *item);
 ```
 
-Delete an item from the index
+</details>
+<details>
+  <summary>mindex_get(mindex, pattern)</summary>
 
-**:warning: CAUTION :warning:**: Deletes by finding in the index with the
-compare fn, not by the pointer of the given item/pattern.
+  Simple query, fetch an entry in the index matching the pattern
 
-```c
-size_t            mindex_length(struct mindex_t *mindex);
+```C
+void * mindex_get(struct mindex_t *mindex, void *pattern);
 ```
 
-Returns the amount of items in the index
+</details>
+<details>
+  <summary>mindex_nth(mindex, index)</summary>
 
-```c
-void              mindex_free(struct mindex_t *mindex);
+  Fetch the nth entry in the index
+
+```C
+void * mindex_nth(struct mindex_t *mindex, int index);
 ```
 
-Release the memory used by the index
+</details>
+<details>
+  <summary>mindex_rand(mindex)</summary>
 
-### Extended
+  Retrieve a single random entry from the index
 
-```c
-void            * mindex_rand(struct mindex_t *mindex);
+```C
+void * mindex_rand(struct mindex_t *mindex);
 ```
 
-Retreive a random item from the index
+</details>
+<details>
+  <summary>mindex_delete(mindex, pattern)</summary>
 
+  Delete a single entry from the index matching the pattern
+
+```C
+void mindex_delete(struct mindex_t *mindex, void *pattern);
+```
+
+</details>
+<details>
+  <summary>mindex_length(mindex)</summary>
+
+  The current amount of entries in the index
+
+```C
+size_t mindex_length(struct mindex_t *mindex);
+```
+
+</details>
+<details>
+  <summary>mindex_free(mindex)</summary>
+
+  Purge all entries from the index and free the memory used
+
+```C
+void mindex_free(struct mindex_t *mindex);
+```
+
+</details>
 Testing
 -------
 
-If you want to run the library's tests, simply run `make test` to compile the
-testing binary, and then `./test` to run the actual tests.
+If you want to run the library's tests, simply run `make test` to compile
+the testing binary, and then `./test` to run the actual tests.
 
 License
 -------
