@@ -13,7 +13,8 @@ jobs:
     name: Benchmark default
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
@@ -24,7 +25,8 @@ jobs:
     name: Benchmark -Os
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
@@ -37,7 +39,8 @@ jobs:
     name: Benchmark -O1
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
@@ -50,7 +53,8 @@ jobs:
     name: Benchmark -O2
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
@@ -63,7 +67,8 @@ jobs:
     name: Benchmark -O3
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
@@ -76,7 +81,8 @@ jobs:
     name: Test default
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
@@ -87,7 +93,8 @@ jobs:
     name: Test -Os
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
@@ -100,7 +107,8 @@ jobs:
     name: Test -O1
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
@@ -113,7 +121,8 @@ jobs:
     name: Test -O2
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
@@ -126,7 +135,8 @@ jobs:
     name: Test -O3
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: finwo/stddoc.c@edge
       - uses: finwo/dep@edge
       - run : dep install
       - run : make clean
