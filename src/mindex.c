@@ -123,7 +123,7 @@ void mindex_set(struct mindex_t *mindex, void *item) {
   // Item already in there, notify we skipped insertion
   if (resp->signal & mindex_signal_found) {
     mindex->items[resp->index] = item;
-    mindex->purge(resp->value, mindex->udata);
+    if (mindex->purge) mindex->purge(resp->value, mindex->udata);
     free(resp);
     return;
   }
@@ -171,7 +171,7 @@ void mindex_delete(struct mindex_t *mindex, void *pattern) {
 
   // Call user's purge method
   void *item = mindex->items[resp->index];
-  mindex->purge(item, mindex->udata);
+  if (mindex->purge) mindex->purge(item, mindex->udata);
 
   // Move everything on it's right to it
   void *dst = &(mindex->items[resp->index]);
@@ -195,8 +195,10 @@ void mindex_free(struct mindex_t *mindex) {
 
   // Step 1, purge all entries
   int i;
-  for (i=0; i < mindex->length; i++) {
-    mindex->purge(mindex->items[i], mindex->udata);
+  if (mindex->purge) {
+    for (i=0; i < mindex->length; i++) {
+      mindex->purge(mindex->items[i], mindex->udata);
+    }
   }
 
   // Step 2, free the list
