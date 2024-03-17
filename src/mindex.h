@@ -91,7 +91,7 @@ void mindex_set(struct mindex_t *mindex, void *item);
 ///
 ///   Simple query, fetch an entry in the index matching the pattern
 ///<C
-void * mindex_get(struct mindex_t *mindex, void *pattern);
+void * mindex_get(struct mindex_t *mindex, const void *pattern);
 ///>
 /// </details>
 
@@ -118,7 +118,7 @@ void * mindex_rand(struct mindex_t *mindex);
 ///
 ///   Delete a single entry from the index matching the pattern
 ///<C
-void mindex_delete(struct mindex_t *mindex, void *pattern);
+void mindex_delete(struct mindex_t *mindex, const void *pattern);
 ///>
 /// </details>
 

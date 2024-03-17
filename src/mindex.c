@@ -139,7 +139,7 @@ void mindex_set(struct mindex_t *mindex, void *item) {
   free(resp);
 }
 
-void * mindex_get(struct mindex_t *mindex, void *pattern) {
+void * mindex_get(struct mindex_t *mindex, const void *pattern) {
   struct mindex_find_response *resp = mindex_find(mindex, pattern, mindex->items, mindex->length);
   void *value = resp->value;
   free(resp);
@@ -160,7 +160,7 @@ void * mindex_rand(struct mindex_t *mindex) {
   return mindex->items[rand() % mindex->length];
 }
 
-void mindex_delete(struct mindex_t *mindex, void *pattern) {
+void mindex_delete(struct mindex_t *mindex, const void *pattern) {
   struct mindex_find_response *resp = mindex_find(mindex, pattern, mindex->items, mindex->length);
 
   // Not found = done
