@@ -38,12 +38,25 @@ void mindex_bmark_rstr_1024() {
   }
 }
 
+void mindex_bmark_rstr_65536() {
+  for(int i=0; i<65536; i++) {
+    free(random_str(16));
+  }
+}
+
 void mindex_bmark_assign_1024() {
   struct mindex_t *mindex = mindex_init(fn_compare_string, fn_purge, NULL);
   for(int i=0; i<1024; i++) {
     mindex_set(mindex, random_str(16));
   }
+  mindex_free(mindex);
+}
 
+void mindex_bmark_assign_65536() {
+  struct mindex_t *mindex = mindex_init(fn_compare_string, fn_purge, NULL);
+  for(int i=0; i<65536; i++) {
+    mindex_set(mindex, random_str(16));
+  }
   mindex_free(mindex);
 }
 
@@ -55,6 +68,8 @@ int main() {
 
   BMARK(mindex_bmark_rstr_1024);
   BMARK(mindex_bmark_assign_1024);
+  BMARK(mindex_bmark_rstr_65536);
+  BMARK(mindex_bmark_assign_65536);
   return bmark_run(100, percentiles);
   return 0;
 }
