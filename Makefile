@@ -3,12 +3,12 @@ SRC=$(wildcard src/*.c)
 INCLUDES?=
 INCLUDES+=-I src
 
-override CFLAGS?=-Wall -std=c99
+CFLAGS?=-Wall -std=c99
 
 include lib/.dep/config.mk
 
-override CFLAGS+=$(INCLUDES)
-override CFLAGS+=-D_DEFAULT_SOURCE
+CFLAGS+=$(INCLUDES)
+CFLAGS+=-D_DEFAULT_SOURCE
 
 OBJ=$(SRC:.c=.o)
 
