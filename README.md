@@ -23,6 +23,7 @@ Features
 - Consistent interface, always working with pointers
 - ANSI C (C99)
 - Purge to be called when an item is removed
+
 API
 ---
 
